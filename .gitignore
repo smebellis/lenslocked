@@ -53,6 +53,10 @@ builds/**/images/*
 *.pem
 *.xxjson
 
+# Ignore the lenslocked binary in source
+# code commits
+lenslocked
+
 
 # Anything under a tmp folder
 **/tmp/*
