@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 // This is the function that is called anytime someone comes to the web server
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, "<h1>Welcome to this awesome website</h1>")
+
 }
 
 // Creating a contact handler function to serve a contact page
@@ -44,12 +46,17 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	r := chi.NewRouter()
+
+	//Using Chi Middleware logger
+	r.Use(middleware.Logger)
+
 	r.Get("/", homeHandler)
 	r.Get("/contact", contactHandler)
 	r.Get("/faq", faqHandler)
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page Not Found", http.StatusNotFound)
 	})
+
 	fmt.Println("Starting server on port 3000...")
 	http.ListenAndServe(":3000", r)
 
