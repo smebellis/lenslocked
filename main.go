@@ -3,24 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
-
-// Implement our own custom router
-type Router struct{}
-
-// Method on custom router struct
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
-		homeHandler(w, r)
-	case "/contact":
-		contactHandler(w, r)
-	case "/faq":
-		faqHandler(w, r)
-	default:
-		http.NotFound(w, r)
-	}
-}
 
 // This is the function that is called anytime someone comes to the web server
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,8 +43,14 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	var router Router
+	r := chi.NewRouter()
+	r.Get("/", homeHandler)
+	r.Get("/contact", contactHandler)
+	r.Get("/faq", faqHandler)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Page Not Found", http.StatusNotFound)
+	})
 	fmt.Println("Starting server on port 3000...")
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(":3000", r)
 
 }
