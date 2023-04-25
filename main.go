@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/csrf"
 	"github.com/smebellis/lenslocked/controllers"
 	"github.com/smebellis/lenslocked/models"
 	"github.com/smebellis/lenslocked/templates"
@@ -51,11 +52,20 @@ func main() {
 	r.Get("/signin", usersC.SignIn)
 	r.Post("/signin", usersC.ProcessSignIn)
 
+	r.Get("/users/me", usersC.CurrentUser)
+
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page Not Found", http.StatusNotFound)
 	})
 
 	fmt.Println("Starting server on port 3000...")
-	http.ListenAndServe(":3000", r)
+
+	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	csrfMw := csrf.Protect(
+		[]byte(csrfKey),
+		// TODO: Fix before deploying
+		csrf.Secure(false),
+	)
+	http.ListenAndServe(":3000", csrfMw(r))
 
 }
